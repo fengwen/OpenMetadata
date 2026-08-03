@@ -1,0 +1,273 @@
+# /Users/fengwen/ai_coding/OpenMetadata/docker/development/docker-compose-lite.yml
+# OpenMetadata 精简部署 —— 使用本地构建的 openmetadata-server:latest
+# 复用宿主机已有的 MySQL（mysql_container），单独起 ES 9.x
+#
+# 前置条件：
+#   1. docker network create om_shared
+#   2. MySQL 容器已接入 om_shared 网络，且已创建 openmetadata_db / openmetadata_user
+#   3. 已执行 mvn clean install -DskipTests 构建本地镜像
+#
+# 启动：docker compose -f docker/development/docker-compose-lite.yml up -d
+
+volumes:
+  om-es-data:
+
+services:
+
+  # ---- Elasticsearch 9.x ----
+  om-elasticsearch:
+    container_name: om_elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    ports:
+      - "9201:9200"
+    volumes:
+      - om-es-data:/usr/share/elasticsearch/data
+    networks:
+      - om_shared
+    healthcheck:
+      test: "curl -s http://localhost:9200/_cluster/health?pretty | grep status | grep -qE 'green|yellow' || exit 1"
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  # ---- 数据库迁移（一次性任务）- 使用本地镜像 ----
+  execute-migrate-all:
+    container_name: execute_migrate_all
+    image: openmetadata-server:latest
+    command: "./bootstrap/openmetadata-ops.sh migrate"
+    environment:
+      OPENMETADATA_CLUSTER_NAME: openmetadata
+      SERVER_PORT: 8585
+      SERVER_ADMIN_PORT: 8586
+      LOG_LEVEL: INFO
+      MIGRATION_LIMIT_PARAM: 1200
+
+      # Auth
+      AUTHORIZER_CLASS_NAME: org.openmetadata.service.security.DefaultAuthorizer
+      AUTHORIZER_REQUEST_FILTER: org.openmetadata.service.security.JwtFilter
+      AUTHORIZER_ADMIN_PRINCIPALS: "[admin]"
+      AUTHORIZER_ALLOWED_REGISTRATION_DOMAIN: '["all"]'
+      AUTHORIZER_INGESTION_PRINCIPALS: "[ingestion-bot]"
+      AUTHORIZER_PRINCIPAL_DOMAIN: '"open-metadata.org"'
+      AUTHORIZER_ENFORCE_PRINCIPAL_DOMAIN: "false"
+      AUTHORIZER_ENABLE_SECURE_SOCKET: "false"
+      AUTHENTICATION_PROVIDER: basic
+      AUTHENTICATION_PUBLIC_KEYS: "[http://localhost:8585/api/v1/system/config/jwks]"
+      AUTHENTICATION_ENABLE_SELF_SIGNUP: "true"
+      AUTHENTICATION_CLIENT_TYPE: public
+
+      # JWT
+      RSA_PUBLIC_KEY_FILE_PATH: "./conf/public_key.der"
+      RSA_PRIVATE_KEY_FILE_PATH: "./conf/private_key.der"
+      JWT_ISSUER: "open-metadata.org"
+      JWT_KEY_ID: "Gb389a-9f76-gdjs-a92j-0242bk94356"
+
+      # Pipeline
+      PIPELINE_SERVICE_CLIENT_ENDPOINT: http://ingestion:8080
+      PIPELINE_SERVICE_CLIENT_HEALTH_CHECK_INTERVAL: 300
+      SERVER_HOST_API_URL: http://openmetadata-server:8585/api
+      PIPELINE_SERVICE_CLIENT_VERIFY_SSL: "no-ssl"
+
+      # MySQL（外部）
+      DB_DRIVER_CLASS: com.mysql.cj.jdbc.Driver
+      DB_SCHEME: mysql
+      DB_PARAMS: "allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+      DB_USER: openmetadata_user
+      DB_USER_PASSWORD: openmetadata_password
+      DB_HOST: mysql_container
+      DB_PORT: 3306
+      OM_DATABASE: openmetadata_db
+
+      # Elasticsearch
+      ELASTICSEARCH_HOST: om-elasticsearch
+      ELASTICSEARCH_PORT: 9200
+      ELASTICSEARCH_SCHEME: http
+      SEARCH_TYPE: "elasticsearch"
+      ELASTICSEARCH_TRUST_STORE_PATH: ""
+      ELASTICSEARCH_TRUST_STORE_PASSWORD: ""
+      ELASTICSEARCH_CONNECTION_TIMEOUT_SECS: 5
+      ELASTICSEARCH_SOCKET_TIMEOUT_SECS: 60
+      ELASTICSEARCH_KEEP_ALIVE_TIMEOUT_SECS: 600
+      ELASTICSEARCH_BATCH_SIZE: 100
+      ELASTICSEARCH_PAYLOAD_BYTES_SIZE: 10485760
+      ELASTICSEARCH_INDEX_MAPPING_LANG: EN
+
+      # Events
+      EVENT_MONITOR: prometheus
+      EVENT_MONITOR_BATCH_SIZE: 10
+      EVENT_MONITOR_PATH_PATTERN: '["/api/v1/tables/*", "/api/v1/health-check"]'
+      EVENT_MONITOR_LATENCY: "[]"
+
+      # Pipeline Service
+      PIPELINE_SERVICE_CLIENT_ENABLED: "true"
+      PIPELINE_SERVICE_CLIENT_CLASS_NAME: "org.openmetadata.service.clients.pipeline.airflow.AirflowRESTClient"
+      PIPELINE_SERVICE_IP_INFO_ENABLED: "false"
+      PIPELINE_SERVICE_CLIENT_HOST_IP: ""
+      PIPELINE_SERVICE_CLIENT_SECRETS_MANAGER_LOADER: "noop"
+      AIRFLOW_USERNAME: admin
+      AIRFLOW_PASSWORD: admin
+      AIRFLOW_TIMEOUT: 10
+      FERNET_KEY: "jJ/9sz0g0OHxsfxOoSfdFdmk3ysNmPRnH3TUAbz3IHA="
+
+      # Secret Manager
+      SECRET_MANAGER: db
+
+      # Email
+      OM_EMAIL_ENTITY: "OpenMetadata"
+      OM_SUPPORT_URL: "https://slack.open-metadata.org"
+      AUTHORIZER_ENABLE_SMTP: "false"
+
+      # JVM
+      OPENMETADATA_HEAP_OPTS: "-Xmx1G -Xms1G"
+      MASK_PASSWORDS_API: "false"
+
+      # Web
+      WEB_CONF_URI_PATH: "/api"
+      WEB_CONF_HSTS_ENABLED: "false"
+      WEB_CONF_CONTENT_TYPE_OPTIONS_ENABLED: "false"
+      WEB_CONF_XSS_PROTECTION_ENABLED: "false"
+      WEB_CONF_XSS_CSP_ENABLED: "false"
+      WEB_CONF_REFERRER_POLICY_ENABLED: "false"
+      WEB_CONF_PERMISSION_POLICY_ENABLED: "false"
+
+    networks:
+      - om_shared
+    depends_on:
+      om-elasticsearch:
+        condition: service_healthy
+
+  # ---- OpenMetadata Server（本地构建） ----
+  openmetadata-server:
+    container_name: openmetadata_server
+    image: openmetadata-server:latest
+    restart: always
+    environment:
+      OPENMETADATA_CLUSTER_NAME: openmetadata
+      SERVER_PORT: 8585
+      SERVER_ADMIN_PORT: 8586
+      LOG_LEVEL: INFO
+
+      AUTHORIZER_CLASS_NAME: org.openmetadata.service.security.DefaultAuthorizer
+      AUTHORIZER_REQUEST_FILTER: org.openmetadata.service.security.JwtFilter
+      AUTHORIZER_ADMIN_PRINCIPALS: "[admin]"
+      AUTHORIZER_ALLOWED_REGISTRATION_DOMAIN: '["all"]'
+      AUTHORIZER_INGESTION_PRINCIPALS: "[ingestion-bot]"
+      AUTHORIZER_PRINCIPAL_DOMAIN: '"open-metadata.org"'
+      AUTHORIZER_ENFORCE_PRINCIPAL_DOMAIN: "false"
+      AUTHORIZER_ENABLE_SECURE_SOCKET: "false"
+      AUTHENTICATION_PROVIDER: basic
+      AUTHENTICATION_PUBLIC_KEYS: "[http://localhost:8585/api/v1/system/config/jwks]"
+      AUTHENTICATION_ENABLE_SELF_SIGNUP: "true"
+      AUTHENTICATION_CLIENT_TYPE: public
+
+      RSA_PUBLIC_KEY_FILE_PATH: "./conf/public_key.der"
+      RSA_PRIVATE_KEY_FILE_PATH: "./conf/private_key.der"
+      JWT_ISSUER: "open-metadata.org"
+      JWT_KEY_ID: "Gb389a-9f76-gdjs-a92j-0242bk94356"
+
+      PIPELINE_SERVICE_CLIENT_ENDPOINT: http://ingestion:8080
+      PIPELINE_SERVICE_CLIENT_HEALTH_CHECK_INTERVAL: 300
+      SERVER_HOST_API_URL: http://openmetadata-server:8585/api
+      PIPELINE_SERVICE_CLIENT_VERIFY_SSL: "no-ssl"
+
+      DB_DRIVER_CLASS: com.mysql.cj.jdbc.Driver
+      DB_SCHEME: mysql
+      DB_PARAMS: "allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+      DB_USER: openmetadata_user
+      DB_USER_PASSWORD: openmetadata_password
+      DB_HOST: mysql_container
+      DB_PORT: 3306
+      OM_DATABASE: openmetadata_db
+
+      ELASTICSEARCH_HOST: om-elasticsearch
+      ELASTICSEARCH_PORT: 9200
+      ELASTICSEARCH_SCHEME: http
+      SEARCH_TYPE: "elasticsearch"
+      ELASTICSEARCH_TRUST_STORE_PATH: ""
+      ELASTICSEARCH_TRUST_STORE_PASSWORD: ""
+      ELASTICSEARCH_CONNECTION_TIMEOUT_SECS: 5
+      ELASTICSEARCH_SOCKET_TIMEOUT_SECS: 60
+      ELASTICSEARCH_KEEP_ALIVE_TIMEOUT_SECS: 600
+      ELASTICSEARCH_BATCH_SIZE: 100
+      ELASTICSEARCH_PAYLOAD_BYTES_SIZE: 10485760
+      ELASTICSEARCH_INDEX_MAPPING_LANG: EN
+
+      EVENT_MONITOR: prometheus
+      EVENT_MONITOR_BATCH_SIZE: 10
+      EVENT_MONITOR_PATH_PATTERN: '["/api/v1/tables/*", "/api/v1/health-check"]'
+      EVENT_MONITOR_LATENCY: "[]"
+
+      PIPELINE_SERVICE_CLIENT_ENABLED: "true"
+      PIPELINE_SERVICE_CLIENT_CLASS_NAME: "org.openmetadata.service.clients.pipeline.airflow.AirflowRESTClient"
+      PIPELINE_SERVICE_IP_INFO_ENABLED: "false"
+      PIPELINE_SERVICE_CLIENT_HOST_IP: ""
+      PIPELINE_SERVICE_CLIENT_SECRETS_MANAGER_LOADER: "noop"
+      AIRFLOW_USERNAME: admin
+      AIRFLOW_PASSWORD: admin
+      AIRFLOW_TIMEOUT: 10
+      FERNET_KEY: "jJ/9sz0g0OHxsfxOoSfdFdmk3ysNmPRnH3TUAbz3IHA="
+
+      SECRET_MANAGER: db
+
+      OM_EMAIL_ENTITY: "OpenMetadata"
+      OM_SUPPORT_URL: "https://slack.open-metadata.org"
+      AUTHORIZER_ENABLE_SMTP: "false"
+
+      OPENMETADATA_HEAP_OPTS: "-Xmx1G -Xms1G"
+      MASK_PASSWORDS_API: "false"
+
+      WEB_CONF_URI_PATH: "/api"
+      WEB_CONF_HSTS_ENABLED: "false"
+      WEB_CONF_CONTENT_TYPE_OPTIONS_ENABLED: "false"
+      WEB_CONF_XSS_PROTECTION_ENABLED: "false"
+      WEB_CONF_XSS_CSP_ENABLED: "false"
+      WEB_CONF_REFERRER_POLICY_ENABLED: "false"
+      WEB_CONF_PERMISSION_POLICY_ENABLED: "false"
+
+    ports:
+      - "8585:8585"
+      - "8586:8586"
+    depends_on:
+      execute-migrate-all:
+        condition: service_completed_successfully
+    networks:
+      - om_shared
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8586/healthcheck"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  # ---- Ingestion / Airflow ----
+  ingestion:
+    container_name: openmetadata_ingestion
+    image: docker.getcollate.io/openmetadata/ingestion:1.13.1
+    depends_on:
+      openmetadata-server:
+        condition: service_started
+    environment:
+      AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS: "/opt/airflow/dag_generated_configs"
+      DB_HOST: mysql_container
+      DB_PORT: 3306
+      AIRFLOW_DB: airflow_db
+      DB_SCHEME: "mysql+mysqldb"
+      DB_USER: airflow_user
+      DB_PASSWORD: airflow_pass
+    entrypoint: /bin/bash
+    command:
+      - "/opt/airflow/ingestion_dependency.sh"
+    ports:
+      - "8081:8080"
+    networks:
+      - om_shared
+
+networks:
+  om_shared:
+    external: true
+    name: om_shared
