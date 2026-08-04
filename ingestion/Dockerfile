@@ -91,7 +91,7 @@ COPY --chown=airflow:0 ingestion/examples/sample_data /home/airflow/ingestion/ex
 COPY --chown=airflow:0 ingestion/examples/airflow/dags /opt/airflow/dags
 USER airflow
 # Argument to provide for Ingestion Dependencies to install. Defaults to all
-ARG INGESTION_DEPENDENCY="all"
+ARG INGESTION_DEPENDENCY="mysql,postgres,oracle,kafka,doris,elasticsearch,clickhouse,hive"
 
 # Disable pip cache dir
 # https://pip.pypa.io/en/stable/topics/caching/#avoiding-caching
