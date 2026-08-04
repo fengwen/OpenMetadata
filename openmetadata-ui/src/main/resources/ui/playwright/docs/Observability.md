@@ -2,7 +2,7 @@
 
 # Observability
 
-> **6 Components** | **23 Files** | **169 Tests** | **328 Scenarios** 🚀
+> **7 Components** | **35 Files** | **207 Tests** | **431 Scenarios** 🚀
 
 ## Table of Contents
 - [Data Quality](#data-quality)
@@ -11,6 +11,7 @@
 - [Test Library](#test-library)
 - [Rules Library](#rules-library)
 - [Alerts & Notifications](#alerts-notifications)
+- [Logs Viewer](#logs-viewer)
 
 ---
 
@@ -194,6 +195,71 @@
 </details>
 
 <details open>
+<summary>📄 <b>DataQualityDashboard.spec.ts</b> (11 tests, 42 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/DataQualityDashboard.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/DataQualityDashboard.spec.ts)
+
+### Data Quality Dashboard
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Data Quality Dashboard** - DataQualityDashboardTab | DataQualityDashboardTab |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Filter by Owner and verify all API responses succeed* | |
+| | ↳ *Filter by Tier and verify all API responses succeed* | |
+| | ↳ *Filter by Tag and verify all API responses succeed* | |
+| | ↳ *Filter by Glossary Term and verify all API responses succeed* | |
+| | ↳ *Filter by Data Product and verify all API responses succeed* | |
+| | ↳ *Verify New incident for Consistency test case on table3 DQ tab* | |
+| | ↳ *Verify Resolved incident chip for Uniqueness test case on table4 DQ tab* | |
+| | ↳ *Filter by Certification and verify Uniqueness widget shows 1 Failed test case* | |
+| 2 | **Data Quality Dashboard** - Reopen resolved incident in place from the Test Case page | Reopen resolved incident in place from the Test Case page |
+| | ↳ *Open the resolved test case from the DQ tab* | |
+| | ↳ *Test Case page shows the resolved incident with its edit affordance* | |
+| | ↳ *Reopen the incident as Acknowledged from the header* | |
+| 3 | **Data Quality Dashboard** - Dashboard batches all report aggregations into one request (no N+1) | Dashboard batches all report aggregations into one request (no N+1) |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Widgets coalesce into batch POST(s) with no per-widget GET fan-out* | |
+| 4 | **Data Quality Dashboard** - Tier filter sends tier.tagFQN field in ES query (not tags.tagFQN) | Tier filter sends tier.tagFQN field in ES query (not tags.tagFQN) |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Apply Tier filter* | |
+| | ↳ *Verify ES query uses tier.tagFQN field (not tags.tagFQN)* | |
+| 5 | **Data Quality Dashboard** - Tag filter sends tags.tagFQN field in ES query | Tag filter sends tags.tagFQN field in ES query |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Apply Tag filter* | |
+| | ↳ *Verify ES query uses tags.tagFQN field* | |
+| 6 | **Data Quality Dashboard** - Tier and Tag filters produce independent ES filter clauses | Tier and Tag filters produce independent ES filter clauses |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Apply Tier filter* | |
+| | ↳ *Apply Tag filter* | |
+| | ↳ *Verify tier and tag appear in separate must clauses* | |
+| 7 | **Data Quality Dashboard** - Dimension card click should redirect to test cases with applied filters | Dimension card click should redirect to test cases with applied filters |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Click ${...} dimension card and verify redirect* | |
+| 8 | **Data Quality Dashboard** - Entity Health pie chart segment click redirects to Test Cases with correct status | Entity Health pie chart segment click redirects to Test Cases with correct status |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Click failed segment and verify redirect to failed test cases* | |
+| 9 | **Data Quality Dashboard** - Test Case Result pie chart segment click redirects to Test Cases with correct status | Case Result pie chart segment click redirects to Test Cases with correct status |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Click success segment and verify redirect* | |
+| | ↳ *Navigate back to Data Quality dashboard* | |
+| | ↳ *Click failed segment and verify redirect* | |
+| | ↳ *Navigate back to Data Quality dashboard* | |
+| | ↳ *Click aborted segment and verify redirect* | |
+| 10 | **Data Quality Dashboard** - Data Assets Coverage pie chart segment click redirects to Test Suites and Explore | Data Assets Coverage pie chart segment click redirects to Test Suites and Explore |
+| | ↳ *Navigate to Data Quality dashboard* | |
+| | ↳ *Click covered segment and verify redirect to Test Suites* | |
+| | ↳ *Navigate back to Data Quality dashboard* | |
+| | ↳ *Click not covered segment and verify redirect to Explore* | |
+| 11 | **Data Quality Dashboard** - Test Cases list filter — Data Product | Cases list filter — Data Product |
+| | ↳ *Navigate to DQ Test Cases tab* | |
+| | ↳ *Add Data Product advanced filter* | |
+| | ↳ *Select data product and verify API carries dataProductFqn* | |
+| | ↳ *Remove Data Product filter* | |
+
+</details>
+
+<details open>
 <summary>📄 <b>TestCaseResultPermissions.spec.ts</b> (11 tests, 11 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/TestCaseResultPermissions.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/TestCaseResultPermissions.spec.ts)
@@ -285,7 +351,7 @@
 </details>
 
 <details open>
-<summary>📄 <b>DataQuality.spec.ts</b> (5 tests, 17 scenarios)</summary>
+<summary>📄 <b>DataQuality.spec.ts</b> (6 tests, 18 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/DataQuality.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/DataQuality.spec.ts)
 
@@ -314,6 +380,7 @@
 | | ↳ *Navigate to next page* | |
 | | ↳ *Navigate back to previous page* | |
 | | ↳ *Test page size dropdown* | |
+| 6 | **Data Quality** - Editing display name does not emit a phantom tags patch op | Editing display name does not emit a phantom tags patch op |
 
 </details>
 
@@ -357,6 +424,29 @@
 </details>
 
 <details open>
+<summary>📄 <b>FailedTestCaseSampleData.spec.ts</b> (2 tests, 4 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/FailedTestCaseSampleData.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/FailedTestCaseSampleData.spec.ts)
+
+### Failed rows sample fetch gating
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Failed rows sample fetch gating** - gates the sample fetch on failed status | Gates the sample fetch on failed status |
+| | ↳ *passing test case does not request the failed-rows sample* | |
+| | ↳ *failed test case without a sample gets a 404 and shows no error toast* | |
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | FailedTestCaseSampleData | FailedTestCaseSampleData |
+| | ↳ *Highlight the failed test case sample data* | |
+| | ↳ *Delete sample data* | |
+
+</details>
+
+<details open>
 <summary>📄 <b>TestSuiteMultiPipeline.spec.ts</b> (2 tests, 5 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Features/TestSuiteMultiPipeline.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/TestSuiteMultiPipeline.spec.ts)
@@ -371,6 +461,36 @@
 | | ↳ *Update the pipeline* | |
 | | ↳ *Delete the pipeline* | |
 | 2 | Edit the pipeline's test case | Edit the pipeline's test cases  Creates multiple test cases and a TestSuite pipeline, edits the pipeline to unselect a test case, deploys the change, and verifies the persisted selection on re-open. |
+
+</details>
+
+<details open>
+<summary>📄 <b>TestSuite.spec.ts</b> (2 tests, 17 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Pages/TestSuite.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Pages/TestSuite.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Test suite tab switching keeps active bundle suite data after stale table suite response | Suite tab switching keeps active bundle suite data after stale table suite response |
+| 2 | Logical TestSuite | Logical TestSuite |
+| | ↳ *Open create test suite form* | |
+| | ↳ *Verify add test case modal filter dropdowns are visible* | |
+| | ↳ *Filter by Test Type Table and wait for API* | |
+| | ↳ *Filter by Status Success and wait for API* | |
+| | ↳ *Filter by Table and wait for API* | |
+| | ↳ *Filter by Column and wait for API* | |
+| | ↳ *Reset Test Type to All and clear filters, wait for API* | |
+| | ↳ *Select all then unselect all test cases* | |
+| | ↳ *Select test case and create suite* | |
+| | ↳ *Domain Add, Update and Remove* | |
+| | ↳ *User as Owner assign, update & delete for test suite* | |
+| | ↳ *Add test case to logical test suite by owner* | |
+| | ↳ *Add test suite pipeline* | |
+| | ↳ *Remove test case from logical test suite by owner* | |
+| | ↳ *Test suite filters* | |
+| | ↳ *Delete test suite by owner* | |
 
 </details>
 
@@ -391,6 +511,60 @@
 </details>
 
 <details open>
+<summary>📄 <b>TableTestCasePagination.spec.ts</b> (1 tests, 2 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/TableTestCasePagination.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/TableTestCasePagination.spec.ts)
+
+### Table Data Quality tab pagination
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Table Data Quality tab pagination** - renders pagination and navigates when test cases exceed the page size | Renders pagination and navigates when test cases exceed the page size |
+| | ↳ *Pagination control is visible on the Data Quality tab* | |
+| | ↳ *Next page fetches data and updates the page indicator* | |
+
+</details>
+
+<details open>
+<summary>📄 <b>TestCaseStatusAfterReindex.spec.ts</b> (1 tests, 1 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/TestCaseStatusAfterReindex.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/TestCaseStatusAfterReindex.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Test case status survives a full entity reindex | Case status survives a full entity reindex |
+
+</details>
+
+<details open>
+<summary>📄 <b>TestSuiteListAfterReindex.spec.ts</b> (1 tests, 1 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/TestSuiteListAfterReindex.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/TestSuiteListAfterReindex.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Basic test suite stays listed on the table-suites page after a full reindex | Basic test suite stays listed on the table-suites page after a full reindex |
+
+</details>
+
+<details open>
+<summary>📄 <b>TestSuiteSummaryAfterReindex.spec.ts</b> (1 tests, 1 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/TestSuiteSummaryAfterReindex.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/TestSuiteSummaryAfterReindex.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Test suite lastResultTimestamp survives a full entity reindex | Suite lastResultTimestamp survives a full entity reindex |
+
+</details>
+
+<details open>
 <summary>📄 <b>TestSuitePipelineRedeploy.spec.ts</b> (1 tests, 1 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Features/TestSuitePipelineRedeploy.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/TestSuitePipelineRedeploy.spec.ts)
@@ -404,23 +578,25 @@
 </details>
 
 <details open>
-<summary>📄 <b>TestSuite.spec.ts</b> (1 tests, 8 scenarios)</summary>
+<summary>📄 <b>TestSuiteDetailsPage.spec.ts</b> (1 tests, 10 scenarios)</summary>
 
-> Source: [`src/main/resources/ui/playwright/e2e/Pages/TestSuite.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Pages/TestSuite.spec.ts)
+> Source: [`src/main/resources/ui/playwright/e2e/Pages/TestSuiteDetailsPage.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Pages/TestSuiteDetailsPage.spec.ts)
 
 ### Standalone Tests
 
 | # | Test Case | Description |
 |---|-----------|-------------|
-| 1 | Logical TestSuite | Logical TestSuite |
-| | ↳ *Create* | |
-| | ↳ *Domain Add, Update and Remove* | |
-| | ↳ *User as Owner assign, update & delete for test suite* | |
-| | ↳ *Add test case to logical test suite by owner* | |
-| | ↳ *Add test suite pipeline* | |
-| | ↳ *Remove test case from logical test suite by owner* | |
-| | ↳ *Test suite filters* | |
-| | ↳ *Delete test suite by owner* | |
+| 1 | Add test case modal on Test Suite details page - filters and select | Add test case modal on Test Suite details page - filters and select |
+| | ↳ *Create logical test suite* | |
+| | ↳ *Open Add test case modal on details page* | |
+| | ↳ *Verify add test case modal filter dropdowns are visible* | |
+| | ↳ *Filter by Test Type Table and wait for API* | |
+| | ↳ *Filter by Status Success and wait for API* | |
+| | ↳ *Filter by Table and wait for API* | |
+| | ↳ *Filter by Column and wait for API* | |
+| | ↳ *Reset Test Type to All and clear filters, wait for API* | |
+| | ↳ *Select all then unselect all test cases in modal* | |
+| | ↳ *Select test case in modal then cancel* | |
 
 </details>
 
@@ -448,7 +624,40 @@
 ## Incident Manager
 
 <details open>
-<summary>📄 <b>IncidentManager.spec.ts</b> (7 tests, 20 scenarios)</summary>
+<summary>📄 <b>IncidentManagerDateFilter.spec.ts</b> (11 tests, 11 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerDateFilter.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerDateFilter.spec.ts)
+
+### Incident Manager Date Filter
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Incident Manager Date Filter** - Date picker shows placeholder when no date is selected | Date picker shows placeholder when no date is selected |
+| 2 | **Incident Manager Date Filter** - Select preset date range | Select preset date range |
+| 3 | **Incident Manager Date Filter** - Clear selected date range | Clear selected date range |
+| 4 | **Incident Manager Date Filter** - Date filter persists on page reload | Date filter persists on page reload |
+
+### Incident Manager - Date Field Sort Dropdown
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Incident Manager - Date Field Sort Dropdown** - should show "Created At" as the default sort field label | Show "Created At" as the default sort field label |
+| 2 | **Incident Manager - Date Field Sort Dropdown** - should open sort field dropdown on click | Open sort field dropdown on click |
+| 3 | **Incident Manager - Date Field Sort Dropdown** - should switch to "Updated At" and call API with dateField=updatedAt | Switch to "Updated At" and call API with dateField=updatedAt |
+| 4 | **Incident Manager - Date Field Sort Dropdown** - should switch back to "Created at" and call API with dateField=timestamp | Switch back to "Created at" and call API with dateField=timestamp |
+| 5 | **Incident Manager - Date Field Sort Dropdown** - should close sort dropdown after selecting an option | Close sort dropdown after selecting an option |
+
+### Incident Manager Date Filter - Sidebar
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Incident Manager Date Filter - Sidebar** - Date picker shows placeholder by default on Incident Manager page | Date picker shows placeholder by default on Incident Manager page |
+| 2 | **Incident Manager Date Filter - Sidebar** - Select and clear date range on Incident Manager page | Select and clear date range on Incident Manager page |
+
+</details>
+
+<details open>
+<summary>📄 <b>IncidentManager.spec.ts</b> (5 tests, 18 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Features/IncidentManager.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/IncidentManager.spec.ts)
 
@@ -461,7 +670,7 @@
 | | ↳ *Acknowledge table test case's failure* | |
 | | ↳ *Assign incident to user* | |
 | | ↳ *Re-assign incident to user* | |
-| | ↳ *Verify that notifications correctly display mentions for the incident manager* | |
+| | ↳ *Verify that incident mentions are created for the incident manager* | |
 | | ↳ *Re-assign incident from test case page's header* | |
 | | ↳ *Resolve incident* | |
 | 2 | **Incident Manager** - Resolving incident & re-run pipeline | Resolve incident and rerun pipeline  Resolves a failed incident from the list page, confirms closed status, and reruns the TestSuite pipeline to re-evaluate incident state. |
@@ -477,31 +686,46 @@
 | | ↳ *Verify incident's status on DQ page* | |
 | 4 | **Incident Manager** - Validate Incident Tab in Entity details page | Validate Incident tab in entity page  Verifies incidents list within entity details, lineage incident counts, and navigation back to tab. |
 | 5 | **Incident Manager** - Verify filters in Incident Manager's page | Verify filters in Incident Manager page  Tests Assignee, Status, Test Case, and Date filters and confirms list updates accordingly. |
-| 6 | **Incident Manager** - Next, Previous and page indicator | Next, Previous and page indicator |
-| 7 | **Incident Manager** - Page size dropdown updates list limit and resets to page 1 | Page size dropdown updates list limit and resets to page 1 |
 
 </details>
 
 <details open>
-<summary>📄 <b>IncidentManagerDateFilter.spec.ts</b> (6 tests, 6 scenarios)</summary>
+<summary>📄 <b>IncidentManagerPagination.spec.ts</b> (2 tests, 2 scenarios)</summary>
 
-> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerDateFilter.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerDateFilter.spec.ts)
+> Source: [`src/main/resources/ui/playwright/e2e/Features/IncidentManagerPagination.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/IncidentManagerPagination.spec.ts)
 
-### Incident Manager Date Filter
-
-| # | Test Case | Description |
-|---|-----------|-------------|
-| 1 | **Incident Manager Date Filter** - Date picker shows placeholder when no date is selected | Date picker shows placeholder when no date is selected |
-| 2 | **Incident Manager Date Filter** - Select preset date range | Select preset date range |
-| 3 | **Incident Manager Date Filter** - Clear selected date range | Clear selected date range |
-| 4 | **Incident Manager Date Filter** - Date filter persists on page reload | Date filter persists on page reload |
-
-### Incident Manager Date Filter - Sidebar
+### Incident Manager pagination
 
 | # | Test Case | Description |
 |---|-----------|-------------|
-| 1 | **Incident Manager Date Filter - Sidebar** - Date picker shows placeholder by default on Incident Manager page | Date picker shows placeholder by default on Incident Manager page |
-| 2 | **Incident Manager Date Filter - Sidebar** - Select and clear date range on Incident Manager page | Select and clear date range on Incident Manager page |
+| 1 | **Incident Manager pagination** - Next, Previous and page indicator | Next, Previous and page indicator |
+| 2 | **Incident Manager pagination** - Page size dropdown updates list limit and resets to page 1 | Page size dropdown updates list limit and resets to page 1 |
+
+</details>
+
+<details open>
+<summary>📄 <b>IncidentManagerAfterOwnerChange.spec.ts</b> (1 tests, 1 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerAfterOwnerChange.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerAfterOwnerChange.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Incident Manager renders after a test case owner change | Incident Manager renders after a test case owner change |
+
+</details>
+
+<details open>
+<summary>📄 <b>IncidentManagerAfterSoftDelete.spec.ts</b> (1 tests, 1 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerAfterSoftDelete.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/IncidentManagerAfterSoftDelete.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Incident Manager renders without Jackson error after a test case is soft-deleted | Incident Manager renders without Jackson error after a test case is soft-deleted |
 
 </details>
 
@@ -511,6 +735,25 @@
 <div id="profiler"></div>
 
 ## Profiler
+
+<details open>
+<summary>📄 <b>ProfilerIngestionForm.spec.ts</b> (7 tests, 7 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/ProfilerIngestionForm.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/ProfilerIngestionForm.spec.ts)
+
+### Profiler ingestion form — profile sample config
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | **Profiler ingestion form — profile sample config** - STATIC config sends profileSample and no DYNAMIC-only keys | STATIC config sends profileSample and no DYNAMIC-only keys |
+| 2 | **Profiler ingestion form — profile sample config** - STATIC config sends all three static-only fields when set | STATIC config sends all three static-only fields when set |
+| 3 | **Profiler ingestion form — profile sample config** - DYNAMIC with smart sampling ON sends only DYNAMIC keys | DYNAMIC with smart sampling ON sends only DYNAMIC keys |
+| 4 | **Profiler ingestion form — profile sample config** - DYNAMIC with smart sampling OFF and thresholds sends thresholds array | DYNAMIC with smart sampling OFF and thresholds sends thresholds array |
+| 5 | **Profiler ingestion form — profile sample config** - DYNAMIC threshold remove drops only the selected row | DYNAMIC threshold remove drops only the selected row |
+| 6 | **Profiler ingestion form — profile sample config** - **switching DYNAMIC** → STATIC does not leak smartSampling or thresholds | Switching DYNAMIC → STATIC does not leak smartSampling or thresholds |
+| 7 | **Profiler ingestion form — profile sample config** - **switching STATIC** → DYNAMIC does not leak static-only fields | Switching STATIC → DYNAMIC does not leak static-only fields |
+
+</details>
 
 <details open>
 <summary>📄 <b>Profiler.spec.ts</b> (4 tests, 5 scenarios)</summary>
@@ -531,7 +774,7 @@
 </details>
 
 <details open>
-<summary>📄 <b>ProfilerConfigurationPage.spec.ts</b> (2 tests, 4 scenarios)</summary>
+<summary>📄 <b>ProfilerConfigurationPage.spec.ts</b> (3 tests, 8 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Pages/ProfilerConfigurationPage.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Pages/ProfilerConfigurationPage.spec.ts)
 
@@ -543,7 +786,12 @@
 | | ↳ *Verify validation* | |
 | | ↳ *Update profiler configuration* | |
 | | ↳ *Remove Configuration* | |
-| 2 | **Profiler Configuration Page** - Non admin user | Non-admin user access restriction  Verifies that non-admin users cannot access profiler configuration preferences. |
+| 2 | **Profiler Configuration Page** - Sample Data Ingestion Configuration | Sample Data Ingestion Configuration  Validates the sample data config section: toggle rendering, default state, and the "store enables read" auto-toggle behavior. |
+| | ↳ *Verify sample data config section renders* | |
+| | ↳ *Toggling store ON auto-enables read* | |
+| | ↳ *Toggling off one does not affect the other* | |
+| | ↳ *Sample data config is included in save payload* | |
+| 3 | **Profiler Configuration Page** - Non admin user | Non-admin user access restriction  Verifies that non-admin users cannot access profiler configuration preferences. |
 
 </details>
 
@@ -555,7 +803,7 @@
 ## Test Library
 
 <details open>
-<summary>📄 <b>TestLibrary.spec.ts</b> (14 tests, 30 scenarios)</summary>
+<summary>📄 <b>TestLibrary.spec.ts</b> (15 tests, 33 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Features/DataQuality/TestLibrary.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Features/DataQuality/TestLibrary.spec.ts)
 
@@ -572,18 +820,22 @@
 | | ↳ *should enable/disable test definition* | |
 | | ↳ *should delete a test definition* | |
 | 5 | **Test Library** - should validate required fields in create form | Validate required fields in create form |
-| 6 | **Test Library** - should cancel form and close drawer | Cancel form and close drawer |
-| 7 | **Test Library** - should display pagination when test definitions exceed page size | Display pagination when test definitions exceed page size |
-| 8 | **Test Library** - should display test platform badges correctly | Display test platform badges correctly |
-| 9 | **Test Library** - should not show edit and delete buttons for system test definitions | Not show edit and delete buttons for system test definitions |
-| 10 | **Test Library** - should allow enabling/disabling system test definitions | Allow enabling/disabling system test definitions |
-| 11 | **Test Library** - should disable toggle for external test definitions | Disable toggle for external test definitions |
-| 12 | **Test Library** - should handle external test definitions with read-only fields | Handle external test definitions with read-only fields |
+| 6 | **Test Library** - should require supported data types only when OpenMetadata platform is selected | Require supported data types only when OpenMetadata platform is selected |
+| | ↳ *Open create form* | |
+| | ↳ *Verify supported data types is required with default OpenMetadata platform* | |
+| | ↳ *Remove OpenMetadata and select only dbt — field should not be required* | |
+| 7 | **Test Library** - should cancel form and close drawer | Cancel form and close drawer |
+| 8 | **Test Library** - should display pagination when test definitions exceed page size | Display pagination when test definitions exceed page size |
+| 9 | **Test Library** - should display test platform badges correctly | Display test platform badges correctly |
+| 10 | **Test Library** - should not show edit and delete buttons for system test definitions | Not show edit and delete buttons for system test definitions |
+| 11 | **Test Library** - should allow enabling/disabling system test definitions | Allow enabling/disabling system test definitions |
+| 12 | **Test Library** - should disable toggle for external test definitions | Disable toggle for external test definitions |
+| 13 | **Test Library** - should handle external test definitions with read-only fields | Handle external test definitions with read-only fields |
 | | ↳ *Create external test definition* | |
 | | ↳ *Verify fields are read-only in edit mode* | |
-| | ↳ *Verify allowed fields can be edited* | |
+| | ↳ *Verify allowed fields can be edited and DQ Dimension can be added* | |
 | | ↳ *Delete external test definition* | |
-| 13 | **Test Library** - should handle supported services field correctly | Handle supported services field correctly |
+| 14 | **Test Library** - should handle supported services field correctly | Handle supported services field correctly |
 | | ↳ *Create test definition with specific supported services* | |
 | | ↳ *Verify supported services are saved correctly* | |
 | | ↳ *Verify test definition appears when filtering by supported services* | |
@@ -591,7 +843,7 @@
 | | ↳ *Verify updated supported services are persisted* | |
 | | ↳ *Clear all supported services (should apply to all services)* | |
 | | ↳ *Delete test definition* | |
-| 14 | **Test Library** - should maintain page on edit and reset to first page on delete | Maintain page on edit and reset to first page on delete |
+| 15 | **Test Library** - should maintain page on edit and reset to first page on delete | Maintain page on edit and reset to first page on delete |
 | | ↳ *Create a test definition starting with "z"* | |
 | | ↳ *Change page size to 25* | |
 | | ↳ *Navigate until we find our test definition or reach last page* | |
@@ -692,6 +944,46 @@
 ## Alerts & Notifications
 
 <details open>
+<summary>📄 <b>ObservabilityAlerts.spec.ts</b> (7 tests, 22 scenarios)</summary>
+
+> Source: [`src/main/resources/ui/playwright/e2e/Flow/ObservabilityAlerts.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Flow/ObservabilityAlerts.spec.ts)
+
+### Standalone Tests
+
+| # | Test Case | Description |
+|---|-----------|-------------|
+| 1 | Pipeline Alert | Pipeline Alert |
+| | ↳ *Create alert* | |
+| | ↳ *Verify diagnostic info tab* | |
+| | ↳ *Check created alert details* | |
+| | ↳ *Edit alert* | |
+| | ↳ *Delete alert* | |
+| 2 | Table alert | Table alert |
+| | ↳ *Create alert* | |
+| | ↳ *Check created alert details* | |
+| | ↳ *Delete alert* | |
+| 3 | Ingestion Pipeline alert | Ingestion Pipeline alert |
+| | ↳ *Create alert* | |
+| | ↳ *Check created alert details* | |
+| | ↳ *Delete alert* | |
+| 4 | Test case alert | Case alert |
+| | ↳ *Create alert* | |
+| | ↳ *Check created alert details* | |
+| | ↳ *Delete alert* | |
+| 5 | Test Suite alert | Suite alert |
+| | ↳ *Create alert* | |
+| | ↳ *Check created alert details* | |
+| | ↳ *Delete alert* | |
+| 6 | Data Contract Name filter lists matching data contracts | Data Contract Name filter lists matching data contracts |
+| 7 | Alert operations for a user with and without permissions | Alert operations for a user with and without permissions |
+| | ↳ *Create and trigger alert* | |
+| | ↳ *Checks for user without permission* | |
+| | ↳ *Check alert details page and Recent Events tab* | |
+| | ↳ *Delete alert* | |
+
+</details>
+
+<details open>
 <summary>📄 <b>NotificationAlerts.spec.ts</b> (6 tests, 17 scenarios)</summary>
 
 > Source: [`src/main/resources/ui/playwright/e2e/Flow/NotificationAlerts.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Flow/NotificationAlerts.spec.ts)
@@ -725,42 +1017,33 @@
 
 </details>
 
+
+---
+
+<div id="logs-viewer"></div>
+
+## Logs Viewer
+
 <details open>
-<summary>📄 <b>ObservabilityAlerts.spec.ts</b> (6 tests, 21 scenarios)</summary>
+<summary>📄 <b>LogsViewer.spec.ts</b> (1 tests, 10 scenarios)</summary>
 
-> Source: [`src/main/resources/ui/playwright/e2e/Flow/ObservabilityAlerts.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Flow/ObservabilityAlerts.spec.ts)
+> Source: [`src/main/resources/ui/playwright/e2e/Pages/LogsViewer.spec.ts`](https://github.com/open-metadata/OpenMetadata/blob/main/openmetadata-ui/src/main/resources/ui/playwright/e2e/Pages/LogsViewer.spec.ts)
 
-### Standalone Tests
+### Logs viewer page
 
 | # | Test Case | Description |
 |---|-----------|-------------|
-| 1 | Pipeline Alert | Pipeline Alert |
-| | ↳ *Create alert* | |
-| | ↳ *Verify diagnostic info tab* | |
-| | ↳ *Check created alert details* | |
-| | ↳ *Edit alert* | |
-| | ↳ *Delete alert* | |
-| 2 | Table alert | Table alert |
-| | ↳ *Create alert* | |
-| | ↳ *Check created alert details* | |
-| | ↳ *Delete alert* | |
-| 3 | Ingestion Pipeline alert | Ingestion Pipeline alert |
-| | ↳ *Create alert* | |
-| | ↳ *Check created alert details* | |
-| | ↳ *Delete alert* | |
-| 4 | Test case alert | Case alert |
-| | ↳ *Create alert* | |
-| | ↳ *Check created alert details* | |
-| | ↳ *Delete alert* | |
-| 5 | Test Suite alert | Suite alert |
-| | ↳ *Create alert* | |
-| | ↳ *Check created alert details* | |
-| | ↳ *Delete alert* | |
-| 6 | Alert operations for a user with and without permissions | Alert operations for a user with and without permissions |
-| | ↳ *Create and trigger alert* | |
-| | ↳ *Checks for user without permission* | |
-| | ↳ *Check alert details page and Recent Events tab* | |
-| | ↳ *Delete alert* | |
+| 1 | **Logs viewer page** - Logs page shows breadcrumb, summary, and log viewer or empty state after opening from bundle suite pipeline tab | Logs page shows breadcrumb, summary, and log viewer or empty state after opening from bundle suite pipeline tab |
+| | ↳ *Open Data Quality → Bundle Suites and click on the newly created bundle* | |
+| | ↳ *Open Pipeline tab and click Logs for first pipeline* | |
+| | ↳ *The logs viewer modal opens in place with its toolbar* | |
+| | ↳ *Toggling fullscreen expands and restores the modal* | |
+| | ↳ *Hovering a toolbar button shows its tooltip* | |
+| | ↳ *Toggling wrap flips its pressed state* | |
+| | ↳ *Copying the logs switches the button to the copied state* | |
+| | ↳ *Searching a non-matching term shows the empty state* | |
+| | ↳ *Jump-to-end keeps the log body visible* | |
+| | ↳ *Closing the modal returns to the pipeline tab* | |
 
 </details>
 
